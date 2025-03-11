@@ -1,49 +1,51 @@
 package view;
 
-import controller.PlayerController;
-import controller.TeamController;
+import controller.MatchStatsController;
+import model.DatabaseConnection;
+import java.sql.Connection;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        // Établir la connexion à la base de données
+        Connection connection = DatabaseConnection.connect();
+
+        // Initialiser le contrôleur des statistiques
+        MatchStatsController statsController = new MatchStatsController(connection);
+
+        // Menu de sélection
         Scanner scanner = new Scanner(System.in);
-        PlayerController playerController = new PlayerController();
-        TeamController teamController = new TeamController();
+        int choice;
 
-        while (true) {
-            System.out.println("\n--- Menu ---");
-            System.out.println("1. Ajouter une équipe");
-            System.out.println("2. Ajouter un joueur");
-            System.out.println("3. Voir toutes les équipes");
-            System.out.println("4. Voir tous les joueurs");
-            System.out.println("5. Quitter");
-            System.out.print("Choix : ");
-            int choix = scanner.nextInt();
-            scanner.nextLine();
+        do {
+            System.out.println("\n===== Dota2 Match Statistics =====\n(Eo amin'ilay 3 mbola misy tsy mety");
+            System.out.println("1. Show Top Killers");
+            System.out.println("2. Show Team Statistics");
+            System.out.println("3. Show Team with Most First Kills");
+            System.out.println("0. Exit");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
 
-            switch (choix) {
+            switch (choice) {
                 case 1:
-                    System.out.print("Nom de l'équipe : ");
-                    String teamName = scanner.nextLine();
-                    teamController.addTeam(teamName);
+                    statsController.displayTopKillers();
                     break;
                 case 2:
-                    System.out.print("Nom du joueur : ");
-                    String playerName = scanner.nextLine();
-                    System.out.print("ID de l'équipe : ");
+                    System.out.print("Enter Team ID: ");
                     int teamId = scanner.nextInt();
-                    playerController.addPlayer(playerName, teamId);
+                    statsController.displayTeamStats(teamId);
                     break;
                 case 3:
-                    teamController.getAllTeams().forEach(t -> System.out.println(t.getName()));
+                    statsController.displayTopFirstKillTeam();
                     break;
-                case 4:
-                    playerController.getAllPlayers().forEach(p -> System.out.println(p.getName()));
+                case 0:
+                    System.out.println("Exiting...");
                     break;
-                case 5:
-                    System.out.println("Bye !");
-                    return;
+                default:
+                    System.out.println("❌ Invalid choice. Please try again.");
             }
-        }
+        } while (choice != 0);
+
+        scanner.close();
     }
 }

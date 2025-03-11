@@ -4,15 +4,20 @@ import java.util.Date;
 
 public class Match {
     private int id;
-    private Date datePlayed;
+    private Date date;
 
-    public Match(int id, Date datePlayed) {
+    public Match(int id, Date date) {
         this.id = id;
-        this.datePlayed = datePlayed;
+        this.date = date;
     }
 
-    public int getId() { return id; }
-    public Date getDatePlayed() { return datePlayed; }
+    // Getters et Setters
+    public int getId() {
+        return id;
+    }
 
-    public void setDatePlayed(Date datePlayed) { this.datePlayed = datePlayed; }
+    public Date getDate() {
+        return date;
+    }
+
 }

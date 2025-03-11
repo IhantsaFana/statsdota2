@@ -30,7 +30,7 @@ public class PlayerController {
         String query = "SELECT * FROM players";
         try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
-                players.add(new Player(rs.getInt("id"), rs.getString("name"), rs.getInt("team_id")));
+                players.add(new Player(rs.getInt("id"), rs.getString("name"), rs.getInt("team_id"), rs.getInt("position")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
