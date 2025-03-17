@@ -13,54 +13,33 @@ public class MatchStatsController {
         this.matchStatsDAO = new MatchStatsDAO(connection);
     }
 
-    public void displayTopKillers() {
+    // Retourne la liste des meilleurs killers
+    public List<Map<String, Object>> getTopKillers() {
         try {
-            List<Map<String, Object>> topKillers = matchStatsDAO.getTopKillers();
-            System.out.println("\n🔥 Top Killer(s) in Matches:");
-            for (Map<String, Object> killer : topKillers) {
-                System.out.println("Player ID: " + killer.get("player_id") + " | Total Kills: " + killer.get("total_kills"));
-            }
+            return matchStatsDAO.getTopKillers();
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("❌ Error retrieving top killers.");
+            return null;
         }
     }
 
-    public void displayTeamStats(int teamId) {
+    // Retourne les stats d'une équipe
+    public List<Map<String, Object>> getTeamStats(int teamId) {
         try {
-            List<Map<String, Object>> teamStats = matchStatsDAO.getTeamStats(teamId);
-            System.out.println("\n📊 Team Statistics (Team ID: " + teamId + "):");
-            System.out.printf("%-15s %-10s %-10s %-10s%n", "Player", "Kills", "Deaths", "Assists");
-            for (Map<String, Object> player : teamStats) {
-                System.out.printf("%-15s %-10d %-10d %-10d%n",
-                        player.get("name"), player.get("kills"), player.get("deaths"), player.get("assists"));
-            }
+            return matchStatsDAO.getTeamStats(teamId);
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("❌ Error retrieving team stats.");
+            return null;
         }
     }
-    
-    public void displayBeStats(int teamId) {
-    	try {
-    		List<Map<String, Object>> BeStats = matchStatsDAO.getTeamStats(teamId);
-    	} catch (SQLException e) {
-    		e.printStackTrace();
-    		System.out.print("Erreur");
-    	}
-    }
 
-    public void displayTopFirstKillTeam() {
+    // Retourne l'ID de l'équipe avec le plus de First Kills
+    public int getTopFirstKillTeam() {
         try {
-            int bestTeamId = matchStatsDAO.getTopFirstKillTeam();
-            if (bestTeamId != -1) {
-                System.out.println("\n🏆 Team with Most First Kills: Team ID " + bestTeamId);
-            } else {
-                System.out.println("\n❌ No First Kill data available.");
-            }
+            return matchStatsDAO.getTopFirstKillTeam();
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("❌ Error retrieving top First Kill team.");
+            return -1;
         }
     }
 }

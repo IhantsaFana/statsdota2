@@ -1,39 +1,43 @@
 package controller;
 
+import dao.TeamDAO;
 import model.Team;
 import model.DatabaseConnection;
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 public class TeamController {
-    private Connection connection;
+    private TeamDAO teamDAO;
 
     public TeamController() {
-        this.connection = DatabaseConnection.connect();
-    }
-
-    public void addTeam(String name) {
-        String query = "INSERT INTO teams (name) VALUES (?)";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, name);
-            stmt.executeUpdate();
-            System.out.println("✅ Équipe ajoutée !");
-        } catch (SQLException e) {
-            e.printStackTrace();
+        Connection connection = DatabaseConnection.connect();
+        if (connection != null) {
+            this.teamDAO = new TeamDAO(connection);
+        } else {
+            throw new RuntimeException("❌ Erreur de connexion à la base de données");
         }
     }
 
+    // Ajoute une équipe et retourne true si réussi
+    public boolean addTeam(String name) {
+        try {
+            Team team = new Team(0, name);
+            teamDAO.addTeam(team);
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Retourne la liste de toutes les équipes
     public List<Team> getAllTeams() {
-        List<Team> teams = new ArrayList<>();
-        String query = "SELECT * FROM teams";
-        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
-            while (rs.next()) {
-                teams.add(new Team(rs.getInt("id"), rs.getString("name")));
-            }
+        try {
+            return teamDAO.getAllTeams();
         } catch (SQLException e) {
             e.printStackTrace();
+            return null;
         }
-        return teams;
     }
 }

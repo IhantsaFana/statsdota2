@@ -2,39 +2,53 @@ package controller;
 
 import model.Player;
 import model.DatabaseConnection;
-import java.sql.*;
-import java.util.ArrayList;
+import dao.PlayerDAO;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public class PlayerController {
-    private Connection connection;
+    private PlayerDAO playerDAO;
 
     public PlayerController() {
-        this.connection = DatabaseConnection.connect();
-    }
-
-    public void addPlayer(String name, int teamId) {
-        String query = "INSERT INTO players (name, team_id) VALUES (?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, name);
-            stmt.setInt(2, teamId);
-            stmt.executeUpdate();
-            System.out.println("✅ Joueur ajouté !");
-        } catch (SQLException e) {
-            e.printStackTrace();
+        Connection connection = DatabaseConnection.connect();
+        if (connection != null) {
+            this.playerDAO = new PlayerDAO(connection);
+        } else {
+            throw new RuntimeException("Database connection failed");
         }
     }
 
+    // Ajoute un joueur et retourne true si réussi
+    public boolean addPlayer(String name, int teamId, int position) {
+        try {
+            Player player = new Player(0, name, teamId, position);
+            playerDAO.addPlayer(player);
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Retourne la liste de tous les joueurs
     public List<Player> getAllPlayers() {
-        List<Player> players = new ArrayList<>();
-        String query = "SELECT * FROM players";
-        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
-            while (rs.next()) {
-                players.add(new Player(rs.getInt("id"), rs.getString("name"), rs.getInt("team_id"), rs.getInt("position")));
-            }
+        try {
+            return playerDAO.getAllPlayers();
         } catch (SQLException e) {
             e.printStackTrace();
+            return null;
         }
-        return players;
+    }
+
+    // Retourne les meilleurs joueurs par stats
+    public Map<String, Player> getTopStatsPlayers() {
+        try {
+            return playerDAO.getTopStatsPlayers();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
